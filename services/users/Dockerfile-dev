@@ -1,0 +1,30 @@
+# imagen base
+FROM python:3.7.0-alpine
+
+# instalar dependencias
+RUN apk update && \
+    apk add --virtual build-deps gcc python-dev musl-dev && \
+    apk add postgresql-dev && \
+    apk add netcat-openbsd
+
+# configuracion de carpeta de trabajo
+WORKDIR /usr/src/app
+
+# copiar e instalar requerimientos
+COPY ./requirements.txt /usr/src/app/requirements.txt
+RUN pip install -r requirements.txt
+
+#copiamos entrypoint.sh
+COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
+#RUN chmod -R /usr/src/app/entrypoint.sh
+
+
+
+# copiar app
+COPY . /usr/src/app
+
+# ejecutamos el servidor
+#CMD ["/usr/src/app/entrypoint.sh"]
+CMD ["sh","-c","chmod 777 /usr/src/app/entrypoint.sh && /usr/src/app/entrypoint.sh"] 
+
+#docker-compose -f docker-compose-dev.yml up -d --build
